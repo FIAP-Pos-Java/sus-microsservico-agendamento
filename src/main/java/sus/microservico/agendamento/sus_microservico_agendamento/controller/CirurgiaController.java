@@ -1,16 +1,16 @@
 package sus.microservico.agendamento.sus_microservico_agendamento.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sus.microservico.agendamento.sus_microservico_agendamento.controller.dto.BuscarCirurgiaDTO;
-import sus.microservico.agendamento.sus_microservico_agendamento.controller.dto.CirurgiaDTO;
 import sus.microservico.agendamento.sus_microservico_agendamento.service.CirurgiaService;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/cirurgias")
@@ -37,27 +37,12 @@ public class CirurgiaController {
         return ResponseEntity.ok(cirurgia);
     }
 
-    @PostMapping
-    public ResponseEntity<Void> agendarCirurgia(@Valid @RequestBody CirurgiaDTO dto) {
-        this.logger.info("POST -> /api/v1/cirurgias");
-        this.cirurgiaService.agendarCirurgia(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-    @PutMapping("{id}")
-    public ResponseEntity<Void> atualizarCirurgia(
-            @PathVariable String id,
-            @Valid @RequestBody CirurgiaDTO dto
-    ) {
-        this.logger.info("PUT -> /api/v1/cirurgias/{}", id);
-        this.cirurgiaService.atualizarCirurgia(id, dto);
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> cancelarCirurgia(@PathVariable String id) {
-        this.logger.info("DELETE -> /api/v1/cirurgias/{}", id);
-        this.cirurgiaService.cancelarCirurgia(id);
-        return ResponseEntity.noContent().build();
+    
+    @GetMapping("paciente/{pacienteId}")
+    public ResponseEntity<List<BuscarCirurgiaDTO>> buscarCirurgiasPorPaciente(@PathVariable String pacienteId) {
+        this.logger.info("GET -> /api/v1/cirurgias/paciente/{}", pacienteId);
+        UUID uuid = UUID.fromString(pacienteId);
+        List<BuscarCirurgiaDTO> cirurgias = this.cirurgiaService.buscarCirurgiasPorPaciente(uuid);
+        return ResponseEntity.ok(cirurgias);
     }
 }

@@ -32,4 +32,5 @@ public class Cirurgia {
     private StatusCirurgia status;
     
     private LocalDateTime dataAgendamento;
+    private LocalDateTime dataRecebimento;
 }
