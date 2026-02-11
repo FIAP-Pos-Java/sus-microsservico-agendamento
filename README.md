@@ -18,13 +18,27 @@ Este projeto utiliza variáveis de ambiente para configuração. Crie um arquivo
 - `RABBITMQ_USERNAME`: Usuário do RabbitMQ
 - `RABBITMQ_PASSWORD`: Senha do RabbitMQ
 
-#### Executando o Projeto
-Clone os 3 projetos no mesmo diretório
-sustech
-  -> sus-microsservico-core
-  -> sus-microsservico-agendamento
-  -> sus-microservico-notificacoes
+## Executando o Projeto
 
-Configure o .env de cada projeto (todos tem um .env de exemplo)
+### 1. Estrutura de Diretórios
 
-Abra o bash no sus-microsservico-core e execute o comando `docker-compose build --no-cache`
+Clone os 3 microserviços dentro de um diretório principal chamado `sustech`:
+
+```
+sustech/                              ← Diretório principal
+├── sus-microsservico-core/          ← Microserviço Core (contém o docker-compose.yml)
+├── sus-microsservico-agendamento/   ← Microserviço de Agendamento
+└── sus-microservico-notificacoes/   ← Microserviço de Notificações
+```
+
+### 2. Configuração
+
+Configure o arquivo `.env` de cada microserviço baseado no arquivo `.env.example` presente em cada projeto.
+
+### 3. Build e Execução
+
+Abra o terminal no diretório `sus-microsservico-core` e execute:
+
+```bash
+docker-compose build --no-cache
+```
