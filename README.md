@@ -1,4 +1,4 @@
-# SUS - Microserviço de Agendamento
+# SUS - Microsserviço de Agendamento
 
 ## Configuração
 
