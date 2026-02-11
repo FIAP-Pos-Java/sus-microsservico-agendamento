@@ -33,4 +33,7 @@ public class Cirurgia {
     
     private LocalDateTime dataAgendamento;
     private LocalDateTime dataRecebimento;
+    
+    @Column(nullable = false)
+    private Boolean lembreteEnviado = false;
 }

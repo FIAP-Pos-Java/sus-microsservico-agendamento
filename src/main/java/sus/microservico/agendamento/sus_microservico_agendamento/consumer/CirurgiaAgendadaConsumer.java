@@ -29,38 +29,64 @@ public class CirurgiaAgendadaConsumer {
 
     @RabbitListener(queues = RabbitMQConfig.CIRURGIA_CRIADA_QUEUE)
     public void receberCirurgiaCriada(CirurgiaCriadaEvent evento) {
-        logger.info("Evento de criação recebido para paciente: {}", evento.pacienteId());
-        
-        Cirurgia cirurgia = new Cirurgia();
-        cirurgia.setPacienteId(evento.pacienteId());
-        cirurgia.setMedicoId(evento.medicoId());
-        cirurgia.setDataCirurgia(evento.dataCirurgia());
-        cirurgia.setHoraCirurgia(evento.horaCirurgia());
-        cirurgia.setLocal(evento.local());
-        cirurgia.setDescricao(evento.descricao());
-        cirurgia.setStatus(evento.status());
-        cirurgia.setDataAgendamento(LocalDateTime.now());
-        cirurgia.setDataRecebimento(LocalDateTime.now());
-        
-        Cirurgia cirurgiaCriada = cirurgiaRepository.save(cirurgia);
-        logger.info("Cirurgia {} criada com sucesso", cirurgiaCriada.getId());
-        
-        NotificacaoCirurgiaCriadaEvent notificacaoEvento = new NotificacaoCirurgiaCriadaEvent(
-                cirurgiaCriada.getId(),
-                cirurgiaCriada.getPacienteId(),
-                cirurgiaCriada.getMedicoId(),
-                cirurgiaCriada.getDataCirurgia(),
-                cirurgiaCriada.getHoraCirurgia(),
-                cirurgiaCriada.getLocal()
-        );
-        
-        rabbitTemplate.convertAndSend(
-                RabbitMQConfig.EXCHANGE,
-                RabbitMQConfig.NOTIFICACAO_CIRURGIA_CRIADA_ROUTING_KEY,
-                notificacaoEvento
-        );
-        
-        logger.info("Evento de notificação de criação publicado para cirurgia {}", cirurgiaCriada.getId());
+        try {
+            logger.info("==========================================================");
+            logger.info(" EVENTO DE CIRURGIA CRIADA RECEBIDO");
+            logger.info("Paciente ID: {}", evento.pacienteId());
+            logger.info("Médico ID: {}", evento.medicoId());
+            logger.info("Data: {} às {}", evento.dataCirurgia(), evento.horaCirurgia());
+            logger.info("Local: {}", evento.local());
+            logger.info("==========================================================");
+            
+            Cirurgia cirurgia = new Cirurgia();
+            cirurgia.setPacienteId(evento.pacienteId());
+            cirurgia.setMedicoId(evento.medicoId());
+            cirurgia.setDataCirurgia(evento.dataCirurgia());
+            cirurgia.setHoraCirurgia(evento.horaCirurgia());
+            cirurgia.setLocal(evento.local());
+            cirurgia.setDescricao(evento.descricao());
+            cirurgia.setStatus(evento.status());
+            cirurgia.setDataAgendamento(LocalDateTime.now());
+            cirurgia.setDataRecebimento(LocalDateTime.now());
+            cirurgia.setLembreteEnviado(false);
+            
+            Cirurgia cirurgiaCriada = cirurgiaRepository.save(cirurgia);
+            logger.info("==========================================================");
+            logger.info(" CIRURGIA SALVA NO BANCO COM SUCESSO");
+            logger.info("Cirurgia ID: {}", cirurgiaCriada.getId());
+            logger.info("==========================================================");
+            
+            NotificacaoCirurgiaCriadaEvent notificacaoEvento = new NotificacaoCirurgiaCriadaEvent(
+                    cirurgiaCriada.getId(),
+                    cirurgiaCriada.getPacienteId(),
+                    cirurgiaCriada.getMedicoId(),
+                    cirurgiaCriada.getDataCirurgia(),
+                    cirurgiaCriada.getHoraCirurgia(),
+                    cirurgiaCriada.getLocal()
+            );
+            
+            logger.info("Enviando evento de notificação para RabbitMQ...");
+            logger.info("Routing Key: {}", RabbitMQConfig.NOTIFICACAO_CIRURGIA_CRIADA_ROUTING_KEY);
+            
+            rabbitTemplate.convertAndSend(
+                    RabbitMQConfig.EXCHANGE,
+                    RabbitMQConfig.NOTIFICACAO_CIRURGIA_CRIADA_ROUTING_KEY,
+                    notificacaoEvento
+            );
+            
+            logger.info("==========================================================");
+            logger.info(" EVENTO DE NOTIFICAÇÃO PUBLICADO COM SUCESSO");
+            logger.info("Cirurgia ID: {}", cirurgiaCriada.getId());
+            logger.info("==========================================================");
+        } catch (Exception e) {
+            logger.error("==========================================================");
+            logger.error(" ERRO AO PROCESSAR CIRURGIA CRIADA");
+            logger.error("Paciente ID: {}", evento.pacienteId());
+            logger.error("Erro: {}", e.getMessage());
+            logger.error("Stack trace:", e);
+            logger.error("==========================================================");
+            throw e;
+        }
     }
 
     @RabbitListener(queues = RabbitMQConfig.CIRURGIA_ATUALIZADA_QUEUE)
